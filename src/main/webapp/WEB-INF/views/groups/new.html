@@ -48,6 +48,7 @@
                        placeholder="Enter number group"/>
             </div>
         </div>
+        <div style="color: red" th:if="${#fields.hasErrors('numberGroup')}" th:errors="*{numberGroup}"></div>
 
         <br>
         <input class="btn btn-primary" type="submit" value="Create group"/>

@@ -19,15 +19,15 @@
 </nav>
 
 <div class="ml-5">
-    <form th:method="POST" th:action="@{/lessons}">
+    <form th:method="POST" th:action="@{/lessons}" th:object="${newLesson}">
 
         <div class="form-group row">
             <label for="subject">Select subject</label>
             <div class="col-sm-6">
-                <select name="subjectId" class="form-control" id="subject">
-                    <option th:each="subject : ${subjects}"
-                            th:value="${subject.id}"
-                            th:text="${subject.name}"></option>
+                <select class="form-control" th:field="*{subject}" id="subject">
+                    <option th:each="subjectFromList : ${subjects}"
+                            th:value="${subjectFromList.id}"
+                            th:text="${subjectFromList.name}"></option>
                 </select>
             </div>
         </div>
@@ -36,22 +36,23 @@
             <label for="dateTime">Enter a time:</label>
         </div>
         <div class="col-sm-6">
-            <input name="dateTime" type="datetime-local" id="dateTime">
+            <input type="datetime-local" th:field="*{dateTime}" id="dateTime">
         </div>
-
+        <div style="color: red" th:if="${#fields.hasErrors('dateTime')}" th:errors="*{dateTime}"></div>
 
         <div class="form-group row">
             <label for="duration">Enter duration: </label>
             <div class="col-sm-6">
-                <input name="duration" type="text" id="duration" class="form-control"
+                <input type="text" th:field="*{duration}" id="duration" class="form-control"
                        placeholder="Enter duration"/>
             </div>
         </div>
+        <div style="color: red" th:if="${#fields.hasErrors('duration')}" th:errors="*{duration}"></div>
 
         <div class="form-group row">
             <label for="classRoom">Select classroom</label>
             <div class="col-sm-6">
-                <select name="classRoomId" class="form-control" id="classRoom">
+                <select class="form-control" th:field="*{classRoom}" id="classRoom">
                     <option th:each="classroom : ${classrooms}"
                             th:value="${classroom.id}"
                             th:text="${classroom.name}"></option>
@@ -62,14 +63,15 @@
         <div class="form-group row">
             <label for="groups">Select groups</label>
             <div class="col-sm-6">
-                <select name="lessonForGroups" multiple class="form-control" id="groups">
+                <select multiple class="form-control" id="groups" th:field="*{groups}">
                     <option th:each="group : ${groups}"
                             th:value="${group.id}"
                             th:text="${group.course.faculty.name + ': ' + group.course.numberCourse
-                            + ' course, ' + group.numberGroup + ' group'}"></option>
+                                    + ' course, ' + group.numberGroup + ' group'}"></option>
                 </select>
             </div>
         </div>
+        <div style="color: red" th:if="${#fields.hasErrors('groups')}" th:errors="*{groups}"></div>
 
         <input class="btn btn-primary" type="submit" value="Create lesson"/>
     </form>

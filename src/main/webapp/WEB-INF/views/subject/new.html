@@ -26,6 +26,7 @@
                        placeholder="Enter name for subject"/>
             </div>
         </div>
+        <div style="color: red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
 
         <div class="form-group row">
             <label for="description">Enter description: </label>
@@ -34,6 +35,7 @@
                        placeholder="Enter description for subject"/>
             </div>
         </div>
+        <div style="color: red" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
 
         <div class="form-group row">
             <label for="teacherId">Select teacher: </label>
@@ -55,6 +57,7 @@
                        placeholder="Enter amount lessons for subject"/>
             </div>
         </div>
+        <div style="color: red" th:if="${#fields.hasErrors('amountLessons')}" th:errors="*{amountLessons}"></div>
 
         <input class="btn btn-primary" type="submit" value="Create subject"/>
     </form>

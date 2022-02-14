@@ -4,11 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ua.com.foxminded.university.entities.Course;
 import ua.com.foxminded.university.entities.Faculty;
 import ua.com.foxminded.university.service.CourseService;
 import ua.com.foxminded.university.service.FacultyService;
+
+import javax.validation.Valid;
 
 
 @Controller
@@ -41,8 +44,14 @@ public class CourseController {
     }
 
     @PostMapping()
-    public String createCourse(@ModelAttribute("course") Course course) {
+    public String createCourse(@ModelAttribute("course") @Valid Course course,
+                               BindingResult bindingResult,
+                               @PathVariable("idFaculty") int idFaculty, Model model) {
         log.info("Enter: createCourse('{}')", course);
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("faculty", facultyService.findById(idFaculty));
+            return "courses/new";
+        }
         Course result = courseService.save(course);
         log.info("Exit: {}", result);
         return "redirect:/faculties/{idFaculty}/courses/" + result.getId();

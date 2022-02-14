@@ -5,6 +5,7 @@ import lombok.experimental.SuperBuilder;
 import ua.com.foxminded.university.entities.Position;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
 
 @Entity
 @NoArgsConstructor
@@ -21,5 +22,6 @@ public class Employee extends Person {
     @ToString.Exclude
     private Position position;
     @NonNull
+    @Min(value = 0, message = "Salary should be greater than zero")
     private Integer salary;
 }

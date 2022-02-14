@@ -30,6 +30,7 @@
                        placeholder="Enter new name for faculty"/>
             </div>
         </div>
+        <div style="color: red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
 
         <div class="form-group row">
             <label for="description">Enter description: </label>
@@ -38,6 +39,7 @@
                        placeholder="Enter new description for faculty"/>
             </div>
         </div>
+        <div style="color: red" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
 
         <input class="btn btn-primary" type="submit" value="Update"/>
     </form>

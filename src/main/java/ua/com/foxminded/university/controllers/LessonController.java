@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ua.com.foxminded.university.dto.LessonDto;
 import ua.com.foxminded.university.entities.ClassRoom;
@@ -15,6 +16,7 @@ import ua.com.foxminded.university.entities.person.Employee;
 import ua.com.foxminded.university.service.*;
 
 
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -57,28 +59,28 @@ public class LessonController {
         model.addAttribute("classrooms", allClassrooms);
         List<Group> allGroups = groupService.findAll();
         model.addAttribute("groups", allGroups);
+        model.addAttribute("newLesson", new Lesson());
         log.info("Exit: {}, {}, {}", allSubjects, allClassrooms, allGroups);
         return "/lessons/new";
     }
 
     @PostMapping
-    public String create(@RequestParam("subjectId") Integer subjectId,
-                         @RequestParam("dateTime")
-                         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime localDateTime,
-                         @RequestParam("duration") Integer duration,
-                         @RequestParam("classRoomId") Integer classRoomId,
-                         @RequestParam("lessonForGroups") List<Integer> lessonForGroups) {
-        log.info("Enter: create('{}', '{}', '{}', '{}', '{}')", subjectId, localDateTime, duration, classRoomId, lessonForGroups);
-        Lesson lesson = new Lesson(localDateTime, duration, classRoomService.findById(classRoomId), subjectService.findById(subjectId));
-        Lesson result = lessonService.save(lesson, lessonForGroups);
-        log.info("Exit: {}", result);
-        return "redirect:/lessons/" + result.getId();
+    public String create(@ModelAttribute("newLesson") @Valid Lesson lesson, BindingResult bindingResult,
+                         Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("groups", groupService.findAll());
+            model.addAttribute("classrooms", classRoomService.findAll());
+            model.addAttribute("subjects", subjectService.findAll());
+            return "/lessons/new";
+        }
+        lessonService.save(lesson);
+        return "redirect:/lessons/" + lesson.getId();
     }
 
     @GetMapping("/{idLesson}/edit")
     public String getPageEdit(@PathVariable("idLesson") Integer idLesson, Model model) {
         log.info("Enter: getPageEdit('{}')", idLesson);
-        LessonDto lesson = lessonService.findLessonDtoById(idLesson);
+        Lesson lesson = lessonService.getLessonById(idLesson);
         model.addAttribute("lesson", lesson);
         List<Subject> allSubjects = subjectService.findAll();
         model.addAttribute("subjects", allSubjects);
@@ -91,20 +93,21 @@ public class LessonController {
     }
 
     @PatchMapping("/{idLesson}")
-    public String update(@RequestParam("subjectId") Integer subjectId,
-                         @RequestParam("dateTime")
-                         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime localDateTime,
-                         @RequestParam("duration") Integer duration,
-                         @RequestParam("classRoomId") Integer classRoomId,
-                         @RequestParam("lessonForGroups") List<Integer> lessonForGroups,
-                         @PathVariable("idLesson") Integer idLesson) {
-        log.info("Enter: update('{}', '{}', '{}', '{}', '{}')", subjectId, localDateTime, duration, classRoomId, lessonForGroups, idLesson);
-        Lesson lesson = new Lesson(localDateTime, duration, classRoomService.findById(classRoomId), subjectService.findById(subjectId));
+    public String update(@ModelAttribute("lesson") @Valid Lesson lesson, BindingResult bindingResult,
+                         @PathVariable("idLesson") Integer idLesson,
+                         Model model) {
+        log.info("Enter: update('{}')", lesson);
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("classrooms", classRoomService.findAll());
+            model.addAttribute("groups", groupService.findAll());
+            model.addAttribute("subjects", subjectService.findAll());
+            return "lessons/edit";
+        }
         lesson.setId(idLesson);
-        lessonService.update(lesson, lessonForGroups);
-        log.info("update lesson was success");
-        return "redirect:/lessons/" + idLesson;
+        lessonService.update(lesson);
+        return "redirect:/lessons/" + lesson.getId();
     }
+
 
     @DeleteMapping("/{idLesson}")
     public String delete(@PathVariable("idLesson") Integer idLesson) {

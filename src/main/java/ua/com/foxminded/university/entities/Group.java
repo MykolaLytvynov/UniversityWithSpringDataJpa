@@ -4,6 +4,7 @@ import lombok.*;
 import ua.com.foxminded.university.entities.person.Student;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
 import java.util.List;
 
 @Entity
@@ -17,11 +18,13 @@ public class Group {
     private Integer id;
     @NonNull
     @Column(name = "number_group")
+    @Min(value = 1, message = "Number of group should be greater than one")
     private Integer numberGroup;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @ToString.Exclude
     private Course course;
+
     @OneToMany(mappedBy = "group")
     @ToString.Exclude
     private List<Student> students;

@@ -26,6 +26,7 @@
                        placeholder="Enter name"/>
             </div>
         </div>
+        <div style="color: red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
 
         <div class="form-group row">
             <label for="lastName">Enter last name: </label>
@@ -34,6 +35,7 @@
                        placeholder="Enter last name"/>
             </div>
         </div>
+        <div style="color: red" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></div>
 
         <div class="form-group row">
             <label for="positionId">Select position: </label>
@@ -53,6 +55,7 @@
                        placeholder="Enter salary"/>
             </div>
         </div>
+        <div style="color: red" th:if="${#fields.hasErrors('salary')}" th:errors="*{salary}"></div>
 
         <input class="btn btn-primary" type="submit" value="Create employee"/>
     </form>

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ua.com.foxminded.university.entities.Position;
 import ua.com.foxminded.university.entities.Subject;
@@ -13,7 +14,7 @@ import ua.com.foxminded.university.service.PositionService;
 import ua.com.foxminded.university.service.SubjectService;
 
 
-
+import javax.validation.Valid;
 import java.util.List;
 
 @Controller
@@ -56,8 +57,13 @@ public class EmployeeController {
     }
 
     @PostMapping
-    public String create(@ModelAttribute("employee") Employee employee) {
+    public String create(@ModelAttribute("employee") @Valid Employee employee,
+                         BindingResult bindingResult, Model model) {
         log.info("Enter: {}", employee);
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("positions", positionService.findAll());
+            return "employees/new";
+        }
         Employee result = employeeService.save(employee);
         log.info("Exit: {}", result);
         return "redirect:/employees/" + result.getId();
@@ -76,9 +82,14 @@ public class EmployeeController {
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute("employee") Employee employee,
+    public String update(@ModelAttribute("employee") @Valid Employee employee,
+                         BindingResult bindingResult,
                          @PathVariable("id") int id, Model model) {
         log.info("Enter: update('{}', '{}')", employee, id);
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("positions", positionService.findAll());
+            return "employees/edit";
+        }
         employee.setId(id);
         employeeService.update(employee);
         Employee result = employeeService.findById(employee.getId());

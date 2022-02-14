@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ua.com.foxminded.university.entities.Position;
 import ua.com.foxminded.university.entities.Subject;
@@ -14,6 +15,7 @@ import ua.com.foxminded.university.service.PositionService;
 import ua.com.foxminded.university.service.SubjectService;
 
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Controller
@@ -47,9 +49,15 @@ public class TeacherController {
     }
 
     @PostMapping
-    public String create(@ModelAttribute("teacher") Employee teacher,
+    public String create(@ModelAttribute("teacher") @Valid Employee teacher,
+                         BindingResult bindingResult,
                          @RequestParam("subjectId") Integer subjectId, Model model) {
         log.info("Enter: create('{}', '{}')", teacher, subjectId);
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("positions", positionService.findAll());
+            model.addAttribute("subjectsWithoutTeacher", subjectService.getSubjectsWithoutTeacher());
+            return "employees/teachers/new";
+        }
         Employee employee = employeeService.save(teacher);
         Subject subject = subjectService.findById(subjectId);
         subject.setTeacher(employee);

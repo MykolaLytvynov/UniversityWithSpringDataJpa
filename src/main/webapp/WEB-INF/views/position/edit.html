@@ -28,6 +28,7 @@
                        placeholder="Enter new name for position"/>
             </div>
         </div>
+        <div style="color: red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
 
         <input class="btn btn-primary" type="submit" value="Update"/>
     </form>

@@ -30,6 +30,7 @@
                        placeholder="Enter new name"/>
             </div>
         </div>
+        <div style="color: red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
 
         <div class="form-group row">
             <label for="lastName">Enter new last name: </label>
@@ -38,6 +39,7 @@
                        placeholder="Enter new last name"/>
             </div>
         </div>
+        <div style="color: red" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></div>
 
         <div class="form-group row">
             <label for="positionId">Select another position: </label>
@@ -57,6 +59,7 @@
                        placeholder="Enter salary"/>
             </div>
         </div>
+        <div style="color: red" th:if="${#fields.hasErrors('salary')}" th:errors="*{salary}"></div>
 
         <input class="btn btn-primary" type="submit" value="Update"/>
     </form>

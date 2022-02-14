@@ -22,14 +22,11 @@ public class LessonService {
     private final GroupService groupService;
     private final LessonDtoFormatter lessonDtoFormatter = new LessonDtoFormatter();
 
-    public Lesson save(Lesson lesson, List<Integer> lessonForGroups) {
-        log.debug("save('{}', '{}') called", lesson, lessonForGroups);
-        List<Group> groupsOfOneLesson = new ArrayList<>();
-        for (Integer idGroup : lessonForGroups) {
-            groupsOfOneLesson.add(groupService.findById(idGroup));
-        }
-        if (groupsOfOneLesson != null) lesson.setGroups(groupsOfOneLesson);
+
+    public Lesson save(Lesson lesson) {
+        log.debug("save('{}') called", lesson);
         Lesson result = lessonRepository.save(lesson);
+        log.debug("save('{}') returned '{}'", lesson, result);
         return result;
     }
 
@@ -42,6 +39,15 @@ public class LessonService {
         lessonDto = lessonDtoFormatter.getLessonDtoByLesson(result);
         log.debug("findById('{}') returned '{}'", id, lessonDto);
         return lessonDto;
+    }
+
+    public Lesson getLessonById (Integer id) {
+        log.debug("getLessonById('{}') called", id);
+        NotFoundException notFoundException = new NotFoundException("Lesson not found by id = " + id);
+        Lesson result = lessonRepository.findById(id).orElse(null);
+        if (result == null) throw notFoundException;
+        log.debug("getLessonById('{}') returned '{}'", id, result);
+        return result;
     }
 
 
@@ -79,17 +85,8 @@ public class LessonService {
         log.debug("deleteAll() was success");
     }
 
-    public void update(Lesson lesson, List<Integer> lessonForGroups) {
+    public void update(Lesson lesson) {
         log.debug("update('{}') called", lesson);
-        List<Group> groupsOfOneLesson = new ArrayList<>();
-        if (lessonForGroups.isEmpty()) {
-            lesson.setGroups(lessonRepository.findById(lesson.getId()).get().getGroups());
-        } else {
-            for (Integer idGroup : lessonForGroups) {
-                groupsOfOneLesson.add(groupService.findById(idGroup));
-            }
-            lesson.setGroups(groupsOfOneLesson);
-        }
         lessonRepository.update(lesson.getClassRoom(), lesson.getDateTime(), lesson.getDuration(),
                 lesson.getSubject(), lesson.getGroups(), lesson.getId());
         log.debug("update('{}') was success", lesson);

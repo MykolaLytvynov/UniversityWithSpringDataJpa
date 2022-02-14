@@ -15,7 +15,7 @@
         <div class="form-group row">
             <label for="subject">Select subject</label>
             <div class="col-sm-6">
-                <select name="subjectId" class="form-control" id="subject" th:field="${lesson.subjectId}">
+                <select class="form-control" id="subject" th:field="*{subject}">
                     <option th:each="subject : ${subjects}"
                             th:value="${subject.id}"
                             th:text="${subject.name}"></option>
@@ -27,20 +27,22 @@
             <label for="dateTime">Enter a time:</label>
         </div>
         <div class="col-sm-6">
-            <input name="dateTime" type="datetime-local" id="dateTime" th:field="${lesson.dateTime}">
+            <input type="datetime-local" id="dateTime" th:field="*{dateTime}">
         </div>
+        <div style="color: red" th:if="${#fields.hasErrors('dateTime')}" th:errors="*{dateTime}"></div>
 
         <div class="form-group row">
             <label for="duration">Enter duration: </label>
             <div class="col-sm-6">
-                <input name="duration" type="text" id="duration" class="form-control" th:field="${lesson.duration}"/>
+                <input type="text" id="duration" class="form-control" th:field="*{duration}"/>
             </div>
         </div>
+        <div style="color: red" th:if="${#fields.hasErrors('duration')}" th:errors="*{duration}"></div>
 
         <div class="form-group row">
             <label for="classRoom">Select classroom</label>
             <div class="col-sm-6">
-                <select name="classRoomId" class="form-control" id="classRoom" th:field="${lesson.classRoomId}">
+                <select class="form-control" id="classRoom" th:field="*{classRoom}">
                     <option th:each="classroom : ${classrooms}"
                             th:value="${classroom.id}"
                             th:text="${classroom.name}"></option>
@@ -51,8 +53,7 @@
         <div class="form-group row">
             <label for="groups">Change groups</label>
             <div class="col-sm-6">
-                <select name="lessonForGroups" multiple class="form-control" id="groups">
-                    <option value="">No change</option>
+                <select multiple class="form-control" id="groups" th:field="*{groups}">
                     <option th:each="group : ${groups}"
                             th:value="${group.id}"
                             th:text="${group.course.faculty.name + ': ' + group.course.numberCourse
@@ -60,6 +61,7 @@
                 </select>
             </div>
         </div>
+        <div style="color: red" th:if="${#fields.hasErrors('groups')}" th:errors="*{groups}"></div>
 
         <input class="btn btn-primary" type="submit" value="Update"/>
     </form>

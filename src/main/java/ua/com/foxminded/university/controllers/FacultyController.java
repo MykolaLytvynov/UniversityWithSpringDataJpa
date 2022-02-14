@@ -4,10 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ua.com.foxminded.university.entities.Faculty;
 import ua.com.foxminded.university.service.FacultyService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Controller
@@ -43,8 +45,12 @@ public class FacultyController {
     }
 
     @PostMapping()
-    public String createFaculty(@ModelAttribute("faculty") Faculty faculty) {
+    public String createFaculty(@ModelAttribute("faculty") @Valid Faculty faculty,
+                                BindingResult bindingResult) {
         log.info("Enter: createFaculty('{}')", faculty);
+        if (bindingResult.hasErrors()) {
+            return "faculties/new";
+        }
         Faculty result = facultyService.save(faculty);
         log.info("Exit: {}", result);
         return "redirect:/faculties/" + result.getId();
@@ -60,9 +66,13 @@ public class FacultyController {
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute("faculty") Faculty faculty,
+    public String update(@ModelAttribute("faculty") @Valid Faculty faculty,
+                         BindingResult bindingResult,
                          @PathVariable("id") int id, Model model) {
         log.info("Enter: update('{}', '{}')", faculty, id);
+        if (bindingResult.hasErrors()) {
+            return "faculties/edit";
+        }
         faculty.setId(id);
         facultyService.update(faculty);
         Faculty result = facultyService.findById(faculty.getId());

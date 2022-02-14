@@ -4,10 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ua.com.foxminded.university.entities.ClassRoom;
 import ua.com.foxminded.university.service.ClassRoomService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Controller
@@ -44,8 +46,12 @@ public class ClassRoomController {
     }
 
     @PostMapping()
-    public String createClassroom(@ModelAttribute("classroom") ClassRoom classRoom) {
+    public String createClassroom(@ModelAttribute("classroom") @Valid ClassRoom classRoom,
+                                  BindingResult bindingResult) {
         log.info("Enter: createClassroom('{}')", classRoom);
+        if (bindingResult.hasErrors()) {
+            return "classrooms/new";
+        }
         ClassRoom result = classRoomService.save(classRoom);
         log.info("Exit: {}", result);
         return "redirect:/classrooms/" + result.getId();
@@ -61,9 +67,13 @@ public class ClassRoomController {
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute("classroom") ClassRoom classRoom,
+    public String update(@ModelAttribute("classroom") @Valid ClassRoom classRoom,
+                         BindingResult bindingResult,
                          @PathVariable("id") int id, Model model) {
         log.info("Enter: update('{}', '{}')", classRoom, id);
+        if (bindingResult.hasErrors()) {
+            return "classrooms/edit";
+        }
         classRoom.setId(id);
         classRoomService.update(classRoom);
         model.addAttribute("classroom", classRoom);

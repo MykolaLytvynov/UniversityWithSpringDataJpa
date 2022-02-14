@@ -4,10 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ua.com.foxminded.university.entities.Position;
 import ua.com.foxminded.university.service.PositionService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Controller
@@ -44,8 +46,12 @@ public class PositionController {
     }
 
     @PostMapping
-    public String createPosition(@ModelAttribute("position") Position position) {
+    public String createPosition(@ModelAttribute("position") @Valid Position position,
+                                 BindingResult bindingResult) {
         log.info("Enter: createFaculty('{}')", position);
+        if (bindingResult.hasErrors()) {
+            return "position/new";
+        }
         Position result = positionService.save(position);
         log.info("Exit: {}", result);
         return "redirect:/position/" + result.getId();
@@ -61,8 +67,12 @@ public class PositionController {
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute("position") Position position, @PathVariable("id") int id) {
+    public String update(@ModelAttribute("position") @Valid Position position,
+                         BindingResult bindingResult, @PathVariable("id") int id) {
         log.info("Enter: update('{}', '{}')", position, id);
+        if (bindingResult.hasErrors()) {
+            return "position/edit";
+        }
         position.setId(id);
         positionService.update(position);
         log.info("Exit: {}", position);

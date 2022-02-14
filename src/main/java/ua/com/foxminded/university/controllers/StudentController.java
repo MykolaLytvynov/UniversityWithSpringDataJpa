@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ua.com.foxminded.university.entities.Group;
 import ua.com.foxminded.university.entities.person.Student;
@@ -11,6 +12,7 @@ import ua.com.foxminded.university.service.GroupService;
 import ua.com.foxminded.university.service.StudentService;
 
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Slf4j
@@ -40,8 +42,14 @@ public class StudentController {
     }
 
     @PostMapping("/faculties/{idFaculty}/courses/{idCourse}/groups/{idGroup}/student/")
-    public String create(@ModelAttribute("student") Student student, Model model) {
+    public String create(@ModelAttribute("student") @Valid Student student,
+                         BindingResult bindingResult,
+                         @PathVariable("idGroup") Integer idGroup, Model model) {
         log.info("Enter: create('{}')", student);
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("group", groupService.findById(idGroup));
+            return "students/new";
+        }
         Student result = studentService.save(student);
         model.addAttribute("student", result);
         log.info("Exit: {}", result);
@@ -60,9 +68,16 @@ public class StudentController {
     }
 
     @PatchMapping("/faculties/{idFaculty}/courses/{idCourse}/groups/{idGroup}/student/{idStudent}")
-    public String update(@ModelAttribute("student") Student student,
+    public String update(@ModelAttribute("student") @Valid Student student,
+                         BindingResult bindingResult,
                          @PathVariable("idStudent") Integer studentId, Model model) {
         log.info("Enter: update('{}', '{}')", student, studentId);
+        if (bindingResult.hasErrors()) {
+            student.setGroup(groupService.findById(student.getGroup().getId()));
+            student.setId(studentId);
+            model.addAttribute("groups", groupService.findAll());
+            return "students/edit";
+        }
         student.setId(studentId);
         studentService.update(student);
         Student result = studentService.findById(studentId);

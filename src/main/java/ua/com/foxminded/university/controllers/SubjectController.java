@@ -4,12 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ua.com.foxminded.university.entities.Subject;
 import ua.com.foxminded.university.entities.person.Employee;
 import ua.com.foxminded.university.service.EmployeeService;
 import ua.com.foxminded.university.service.SubjectService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Controller
@@ -50,8 +52,13 @@ public class SubjectController {
     }
 
     @PostMapping
-    public String create(@ModelAttribute("subject") Subject subject, Model model) {
+    public String create(@ModelAttribute("subject") @Valid Subject subject,
+                         BindingResult bindingResult, Model model) {
         log.info("Enter: create('{}')", subject);
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("employees", employeeService.findAll());
+            return "subject/new";
+        }
         if (subject.getTeacher().getId() == null) subject.setTeacher(null);
         Subject result = subjectService.save(subject);
         model.addAttribute("subject", result);
@@ -71,9 +78,14 @@ public class SubjectController {
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute("subject") Subject subject, @PathVariable("id") int id,
+    public String update(@ModelAttribute("subject") @Valid Subject subject,
+                         BindingResult bindingResult, @PathVariable("id") int id,
                          Model model) {
         log.info("Enter: update('{}', '{}')", subject, id);
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("employees", employeeService.findAll());
+            return "subject/edit";
+        }
         subject.setId(id);
         if (subject.getTeacher().getId() == null) subject.setTeacher(null);
         subjectService.update(subject);

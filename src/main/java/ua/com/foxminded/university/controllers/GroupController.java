@@ -4,11 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ua.com.foxminded.university.entities.Course;
 import ua.com.foxminded.university.entities.Group;
 import ua.com.foxminded.university.service.CourseService;
 import ua.com.foxminded.university.service.GroupService;
+
+import javax.validation.Valid;
 
 @Controller
 @Slf4j
@@ -39,8 +42,14 @@ public class GroupController {
     }
 
     @PostMapping()
-    public String createGroup(@ModelAttribute("group") Group group, Model model) {
+    public String createGroup(@ModelAttribute("group") @Valid Group group,
+                              BindingResult bindingResult,
+                              @PathVariable("idCourse") int idCourse, Model model) {
         log.info("Enter: createGroup('{}')", group);
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("course", courseService.findById(idCourse));
+            return "groups/new";
+        }
         Group result = groupService.save(group);
         model.addAttribute("group", result);
         log.info("Exit: {}", result);

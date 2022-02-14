@@ -3,6 +3,7 @@ package ua.com.foxminded.university.entities;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
 import java.util.List;
 
 @Entity
@@ -16,6 +17,7 @@ public class Course {
     private Integer id;
     @NonNull
     @Column(name = "number_course")
+    @Min(value = 1, message = "Number of course should be greater than one")
     private Integer numberCourse;
 
     @ManyToOne(fetch = FetchType.LAZY)

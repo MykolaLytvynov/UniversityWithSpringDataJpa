@@ -41,6 +41,7 @@
                        placeholder="Enter number course"/>
             </div>
         </div>
+        <div style="color: red" th:if="${#fields.hasErrors('numberCourse')}" th:errors="*{numberCourse}"></div>
 
         <br>
         <input class="btn btn-primary" type="submit" value="Create course"/>
